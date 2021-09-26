@@ -117,7 +117,7 @@ fun DeckItem() {
                 fontWeight = FontWeight.Bold,
                 color = Color.Gray
             )
-            Icon( // bulid.gradle (Module: app)에 라이브러리 추가해주기
+            Icon( // bulid.gradle (Module:app)에 라이브러리 추가하기
                 imageVector = Icons.Default.Bookmark,
                 contentDescription = "bookmark",
                 tint = Color.Gray
