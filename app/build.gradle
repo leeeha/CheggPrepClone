@@ -66,4 +66,7 @@ dependencies {
     // Icons
     implementation "androidx.compose.material:material-icons-core:$compose_version"
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
+
+    // ConstraintLayout
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-beta02"
 }
