@@ -73,7 +73,7 @@ fun DefaultPreview() {
 //
 //            DeckTitleTextField()
 //
-              HomeScreen()
+              //HomeScreen()
 
 //            Row(){
 //                FilterText(text = "A", selected = true){
@@ -87,8 +87,7 @@ fun DefaultPreview() {
 //                }
 //            }
 
-            // 이 부분 코드 다시 짜기!!!!
-            //CardItemField()
+            CardItemField()
         }
     }
 }
@@ -261,11 +260,11 @@ fun CardItemField() {
 
     Box(
         modifier = Modifier
-            .fillMaxWidth(.8f)
+            .fillMaxWidth()
             .border(2.dp, Color.LightGray)
     ) {
         //  ConstraintLayout은 다른 요소 또는 레이아웃들과의 관계를 통해서 배치가 이루어지므로
-        //  요소의 가로, 세로에 제약 조건을 하나 이상 설정해줘야 한다.
+        //  요소의 가로 및 세로에 제약 조건을 하나 이상 설정해줘야 한다.
         ConstraintLayout {
             val (front, back, delete, divider) = createRefs()
 
@@ -274,7 +273,7 @@ fun CardItemField() {
                 onValueChange = setFrontText,
                 modifier = Modifier
                     .constrainAs(front) {
-                        // 자식의 top을 parent의 top에 붙인다.
+                        // 본인의 top을 parent의 top에 붙인다.
                         top.linkTo(parent.top)
                     }
                     .fillMaxWidth()
@@ -300,6 +299,7 @@ fun CardItemField() {
             Divider(
                 modifier = Modifier
                     .constrainAs(divider) {
+                        // 본인의 top을 front의 bottom에 붙인다.
                         top.linkTo(front.bottom)
                     }
                     .fillMaxWidth()
@@ -312,15 +312,16 @@ fun CardItemField() {
                 onValueChange = setBackText,
                 modifier = Modifier
                     .constrainAs(back) {
-                        // 자식의 top을 parent의 bottom에 붙인다.
-                        top.linkTo(parent.bottom)
+                        // 본인의 top을 divider의 bottom에 붙인다.
+                        top.linkTo(divider.bottom)
                     }
                     .fillMaxWidth()
+                    .fillMaxHeight()
                     .padding(8.dp),
                 textStyle = MaterialTheme.typography.body1,
                 placeholder = {
                     Text(
-                        text = "Front",
+                        text = "Back",
                         style = MaterialTheme.typography.body1,
                         fontWeight = FontWeight.ExtraBold,
                         color = Color.LightGray
