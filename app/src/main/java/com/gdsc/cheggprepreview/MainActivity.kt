@@ -107,7 +107,6 @@ fun FindFlashCards() {
             .clip(shape = CircleShape)
             // vertical padding은 top/bottom에, horizontal padding은 start/end에 적용됨.
             .padding(vertical = 16.dp, horizontal = 8.dp)
-            // 클릭해서 원하는 플래시카드 찾을 수 있도록
             .clickable {
 
             },
