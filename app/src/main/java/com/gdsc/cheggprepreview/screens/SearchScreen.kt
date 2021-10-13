@@ -15,13 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.gdsc.cheggprepreview.ui.theme.DeepOrange
 
-@Preview(showBackground = true)
 @Composable
-fun SearchScreen() {
+fun SearchScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -47,7 +46,7 @@ fun SearchScreen() {
                 .fillMaxSize()
                 .padding(vertical = 8.dp, horizontal = 16.dp)
         ){
-            FindFlashCards(onClick = {})
+            FindFlashCards(onClick = { /* 텍스트 입력 창이 나오게 해야 한다!! */ })
             Spacer(modifier = Modifier.height(24.dp))
             Divider(
                 Modifier

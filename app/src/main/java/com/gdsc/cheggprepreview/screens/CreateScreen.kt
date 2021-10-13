@@ -8,14 +8,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.gdsc.cheggprepreview.ui.theme.DeepOrange
 import com.gdsc.cheggprepreview.ui.theme.LightOrange
 
-@Preview
 @Composable
-fun CreateScreen() {
+fun CreateScreen(navController: NavHostController) {
     val (deckTitle, setDeckTitle) = remember {
         mutableStateOf("")
     }
@@ -41,7 +40,7 @@ fun CreateScreen() {
                 }
             },
             navigationIcon = {
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
                         imageVector = Icons.Outlined.Close,
                         contentDescription = "close create screen"

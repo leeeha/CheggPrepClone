@@ -22,17 +22,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.gdsc.cheggprepreview.models.DECK_ADDED
 import com.gdsc.cheggprepreview.models.DECK_CREATED
 import com.gdsc.cheggprepreview.models.Deck
+import com.gdsc.cheggprepreview.navigation.Screen
 import com.gdsc.cheggprepreview.ui.theme.DeepOrange
 import com.gdsc.cheggprepreview.ui.theme.SampleDataSet
 
-@Preview
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavHostController) {
     var (selectedFilterIndex, setFilterIndex) = remember {
         mutableStateOf(0)
     }
@@ -60,38 +60,43 @@ fun HomeScreen() {
         }
     ) {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
-
-//            // 1. 리스트의 각 아이템을 순회하는 forEach (현재 아이템은 it)
-//            SampleDataSet.deckSample.forEach {
-//                item {
-//                    // 기존에 Spacer로 줬던 여백을 Modifier.padding으로 전달!
-//                    DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
-//                }
-//            }
-
-            // 2. selectedFilterIndex로 필터링 구현하기!
             when(selectedFilterIndex){
                 0-> // SampleDataSet의 모든 리스트 보여주기
                     SampleDataSet.deckSample.forEach{
                         item{
                             DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
+                            {
+                                navController.navigate(
+                                    Screen.Deck.route + "/${it.deckTitle}/${it.cardList.size}"
+                                )
+                            }
                         }
                     }
                 1-> // deck의 bookmarked가 true인 아이템들만 보여주기
                     SampleDataSet.deckSample.filter { it.bookmarked }.forEach{
                         item{
                             DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
+                            {
+                                navController.navigate(
+                                    Screen.Deck.route + "/${it.deckTitle}/${it.cardList.size}"
+                                )
+                            }
                         }
                     }
                 2-> // deck의 deckType이 DECK_CREATED인 아이템들만 보여주기
                     SampleDataSet.deckSample.filter { it.deckType == DECK_CREATED }.forEach{
                         item{
                             DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
+                            {
+                                navController.navigate(
+                                    Screen.Deck.route + "/${it.deckTitle}/${it.cardList.size}"
+                                )
+                            }
                         }
                     }
             }
 
-            item { MakeMyDeck(onClick = {}) }
+            item { MakeMyDeck(onClick = { navController.navigate(Screen.Create.route)}) }
         }
     }
 }
@@ -127,7 +132,7 @@ fun FilterText(text: String, selected: Boolean, onClick: () -> Unit) {
 
 // DeckItem 하나만으로 모든 Deck를 표현할 수 있다!
 @Composable
-fun DeckItem(deck: Deck, modifier: Modifier) {
+fun DeckItem(deck: Deck, modifier: Modifier, onClick: () -> Unit) {
     Column( // vertical (수직)
         modifier = modifier
             .fillMaxWidth()
@@ -135,9 +140,7 @@ fun DeckItem(deck: Deck, modifier: Modifier) {
                 width = 2.dp,
                 color = Color.LightGray
             )
-            .clickable {
-
-            }
+            .clickable(onClick = onClick)
             .padding(16.dp)
     ) {
         Text(
@@ -158,11 +161,7 @@ fun DeckItem(deck: Deck, modifier: Modifier) {
                 fontWeight = FontWeight.Bold,
                 color = Color.Gray
             )
-//            Icon( // bulid.gradle (Module:app)에 라이브러리 추가하기
-//                imageVector = Icons.Default.Bookmark,
-//                contentDescription = "bookmark",
-//                tint = Color.Gray
-//            )
+
             when(deck.deckType){
                 DECK_CREATED -> { // 내가 만든 DECK이고,
                     if(deck.shared){ // 공유한 것이라면

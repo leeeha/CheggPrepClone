@@ -3,23 +3,16 @@ package com.gdsc.cheggprepreview
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.background
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,61 +20,69 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.gdsc.cheggprepreview.ui.theme.CheggPrepReviewTheme
 import com.gdsc.cheggprepreview.ui.theme.DeepOrange
 import androidx.compose.material.TextFieldDefaults
-import com.gdsc.cheggprepreview.models.DECK_ADDED
-import com.gdsc.cheggprepreview.models.DECK_CREATED
-import com.gdsc.cheggprepreview.models.Deck
-import com.gdsc.cheggprepreview.screens.CreateScreen
-import com.gdsc.cheggprepreview.screens.HomeScreen
-import com.gdsc.cheggprepreview.screens.MoreScreen
-import com.gdsc.cheggprepreview.screens.SearchScreen
-import com.gdsc.cheggprepreview.ui.theme.SampleDataSet
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.gdsc.cheggprepreview.models.Card
+import com.gdsc.cheggprepreview.navigation.BottomNavigationBar
+import com.gdsc.cheggprepreview.navigation.Screen
+import com.gdsc.cheggprepreview.screens.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            CreateScreen()
-        }
-            /*
-//            CheggPrepReviewTheme {
-//                DeckTitleTextField()
-//            }
+            CheggPrepReviewTheme {
+                val navController = rememberNavController()
 
-            // 박스의 크기 상태를 기억하도록
-            var sizeState by remember { mutableStateOf(200.dp)}
+                val (bottomBarShown, showBottomBar) = remember {
+                    mutableStateOf(true)
+                }
 
-            // 연속적으로 값이 변하도록
-            val size by animateDpAsState(targetValue = sizeState,
-              // tween, spring, keyframes 중에 골라서 사용하기
-//            tween(
-//                durationMillis = 3000,
-//                delayMillis = 300,
-//                easing = LinearOutSlowInEasing
-//            )
-            )
+                Scaffold(
+                    bottomBar = {
+                        if (bottomBarShown) {
+                            BottomNavigationBar(navController = navController)
+                        }
+                    }
+                ) {
+                    NavHost(navController = navController, startDestination = Screen.Home.route) {
+                        composable(Screen.Home.route) {
+                            showBottomBar(true)
+                            HomeScreen(navController)
+                        }
 
-            // 유튜브 11강 참고하기
-//            val color by infiniteTransition.animateFloat(
-//                initialValue = Color.Red,
-//                targetValue = Color.Green,
-//                animationSpec = infiniteRepeatable(
-//                    tween(durationMillis = 2000),
-//                    repeatMode = RepeatMode.Reverse
-//                )
-//            )
+                        composable(Screen.Search.route) {
+                            showBottomBar(true)
+                            SearchScreen(navController)
+                        }
 
-            Box(modifier = Modifier
-                .size(size) // dp 변화에 따라 부드럽게 크기가 변하도록
-                .background(Color.Red),
-                contentAlignment = Alignment.Center){
-                // 버튼을 클릭하면 50dp 확대
-                Button(onClick = { sizeState += 50.dp}){
-                    Text("Increase Size")
+                        composable(Screen.Create.route) {
+                            showBottomBar(false)
+                            CreateScreen(navController)
+                        }
+
+                        composable(Screen.More.route) {
+                            showBottomBar(true)
+                            MoreScreen(navController)
+                        }
+
+                        composable(Screen.Deck.route + "/{deckTitle}/{cardsNum}") { backStackEntry ->
+                            val deckTitle =
+                                backStackEntry.arguments?.getString("deckTitle") ?: "no title"
+                            val cardsNum =
+                                backStackEntry.arguments?.getString("cardsNum")?.toInt() ?: 0
+                            showBottomBar(false)
+                            DeckScreen(
+                                navController = navController,
+                                title = deckTitle,
+                                cardsNum = cardsNum
+                            )
+                        }
+                    }
                 }
             }
         }
-             */
-
     }
 }
 
@@ -89,48 +90,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     CheggPrepReviewTheme {
-        Column {
-//            DeckInSubject()
-//            Spacer(modifier = Modifier.height(8.dp))
-//
-//            StudyGuide()
-//            Spacer(modifier = Modifier.height(8.dp))
-//
-//            DeckItem()
-//            Spacer(modifier = Modifier.height(8.dp))
-//
-//            MyDeckItem()
-//            Spacer(modifier = Modifier.height(8.dp))
-//
-//            MakeMyDeck()
-//            Spacer(modifier = Modifier.height(8.dp))
-//
-//            SubjectItem()
-//            Spacer(modifier = Modifier.height(8.dp))
-//
-//            CardItem()
-//            Spacer(modifier = Modifier.height(8.dp))
-
-//            FindFlashCards()
-//
-            //DeckTitleTextField()
-//
-              //HomeScreen()
-
-//            Row(){
-//                FilterText(text = "A", selected = true){
-//
-//                }
-//                FilterText(text = "B", selected = false){
-//
-//                }
-//                FilterText(text = "C", selected = false){
-//
-//                }
-//            }
-
-//            CardItemField()
-        }
     }
 }
 
@@ -334,14 +293,14 @@ fun MyDeckItem() {
 }
 
 @Composable
-fun CardItem() {
+fun CardItem(card: Card) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .border(width = 2.dp, color = Color.LightGray)
     ) {
         Text(
-            text = "Operating Systems",
+            text = card.front,
             modifier = Modifier.padding(16.dp),
             fontWeight = FontWeight.ExtraBold
         )
@@ -353,7 +312,7 @@ fun CardItem() {
             color = Color.LightGray
         )
         Text(
-            text = "A request to execute an OS service-layer function",
+            text = card.back,
             modifier = Modifier.padding(16.dp),
             color = Color.Gray
         )
