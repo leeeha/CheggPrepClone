@@ -30,9 +30,10 @@ import com.gdsc.cheggprepreview.models.Deck
 import com.gdsc.cheggprepreview.navigation.Screen
 import com.gdsc.cheggprepreview.ui.theme.DeepOrange
 import com.gdsc.cheggprepreview.ui.theme.SampleDataSet
+import com.gdsc.cheggprepreview.viewmodel.CheggViewModel
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, viewModel: CheggViewModel) {
     var (selectedFilterIndex, setFilterIndex) = remember {
         mutableStateOf(0)
     }
@@ -62,7 +63,7 @@ fun HomeScreen(navController: NavHostController) {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
             when(selectedFilterIndex){
                 0-> // SampleDataSet의 모든 리스트 보여주기
-                    SampleDataSet.deckSample.forEach{
+                    viewModel.myDeckList.forEach { // 뷰모델에 저장된 myDeckList 가져오기
                         item{
                             DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
                             {
@@ -73,7 +74,7 @@ fun HomeScreen(navController: NavHostController) {
                         }
                     }
                 1-> // deck의 bookmarked가 true인 아이템들만 보여주기
-                    SampleDataSet.deckSample.filter { it.bookmarked }.forEach{
+                    viewModel.myDeckList.filter { it.bookmarked }.forEach{
                         item{
                             DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
                             {
@@ -84,7 +85,7 @@ fun HomeScreen(navController: NavHostController) {
                         }
                     }
                 2-> // deck의 deckType이 DECK_CREATED인 아이템들만 보여주기
-                    SampleDataSet.deckSample.filter { it.deckType == DECK_CREATED }.forEach{
+                    viewModel.myDeckList.filter { it.deckType == DECK_CREATED }.forEach{
                         item{
                             DeckItem(deck = it, modifier = Modifier.padding(bottom = 8.dp))
                             {
@@ -98,35 +99,6 @@ fun HomeScreen(navController: NavHostController) {
 
             item { MakeMyDeck(onClick = { navController.navigate(Screen.Create.route)}) }
         }
-    }
-}
-
-@Composable
-fun FilterSection(selectedFilterIndex: Int, setIndex: (Int) -> Unit) {
-    Row {
-        FilterText("All", selectedFilterIndex == 0) { setIndex(0) }
-        Spacer(modifier = Modifier.width(8.dp))
-        FilterText("Bookmarks", selectedFilterIndex == 1) { setIndex(1) }
-        Spacer(modifier = Modifier.width(8.dp))
-        FilterText("Created", selectedFilterIndex == 2) { setIndex(2) }
-    }
-}
-
-@Composable
-fun FilterText(text: String, selected: Boolean, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .clip(CircleShape)
-            .clickable(enabled = !selected, onClick = onClick)
-            // 선택하면 텍스트 배경을 회색으로, 아니면 투명색으로
-            .background(color = if (selected) Color.LightGray else Color.Transparent)
-            .padding(horizontal = 20.dp, vertical = 2.dp)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.body1,
-            fontWeight = FontWeight.ExtraBold
-        )
     }
 }
 
@@ -190,6 +162,35 @@ fun DeckItem(deck: Deck, modifier: Modifier, onClick: () -> Unit) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun FilterSection(selectedFilterIndex: Int, setIndex: (Int) -> Unit) {
+    Row {
+        FilterText("All", selectedFilterIndex == 0) { setIndex(0) }
+        Spacer(modifier = Modifier.width(8.dp))
+        FilterText("Bookmarks", selectedFilterIndex == 1) { setIndex(1) }
+        Spacer(modifier = Modifier.width(8.dp))
+        FilterText("Created", selectedFilterIndex == 2) { setIndex(2) }
+    }
+}
+
+@Composable
+fun FilterText(text: String, selected: Boolean, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .clip(CircleShape)
+            .clickable(enabled = !selected, onClick = onClick)
+            // 선택하면 텍스트 배경을 회색으로, 아니면 투명색으로
+            .background(color = if (selected) Color.LightGray else Color.Transparent)
+            .padding(horizontal = 20.dp, vertical = 2.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.body1,
+            fontWeight = FontWeight.ExtraBold
+        )
     }
 }
 

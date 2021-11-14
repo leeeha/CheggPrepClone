@@ -10,16 +10,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import com.gdsc.cheggprepreview.ui.theme.CheggPrepReviewTheme
-import com.gdsc.cheggprepreview.ui.theme.DeepOrange
-import androidx.compose.material.TextFieldDefaults
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -27,6 +24,7 @@ import com.gdsc.cheggprepreview.models.Card
 import com.gdsc.cheggprepreview.navigation.BottomNavigationBar
 import com.gdsc.cheggprepreview.navigation.Screen
 import com.gdsc.cheggprepreview.screens.*
+import com.gdsc.cheggprepreview.viewmodel.CheggViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +32,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             CheggPrepReviewTheme {
                 val navController = rememberNavController()
+
+                val cheggViewModel: CheggViewModel = viewModel()
 
                 val (bottomBarShown, showBottomBar) = remember {
                     mutableStateOf(true)
@@ -49,22 +49,22 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = Screen.Home.route) {
                         composable(Screen.Home.route) {
                             showBottomBar(true)
-                            HomeScreen(navController)
+                            HomeScreen(navController, cheggViewModel)
                         }
 
                         composable(Screen.Search.route) {
                             showBottomBar(true)
-                            SearchScreen(navController)
+                            SearchScreen(navController, cheggViewModel)
                         }
 
                         composable(Screen.Create.route) {
                             showBottomBar(false)
-                            CreateScreen(navController)
+                            CreateScreen(navController, cheggViewModel)
                         }
 
                         composable(Screen.More.route) {
                             showBottomBar(true)
-                            MoreScreen(navController)
+                            MoreScreen(navController, cheggViewModel)
                         }
 
                         composable(Screen.Deck.route + "/{deckTitle}/{cardsNum}") { backStackEntry ->

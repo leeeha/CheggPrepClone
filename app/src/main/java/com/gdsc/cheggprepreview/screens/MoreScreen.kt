@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.gdsc.cheggprepreview.ui.theme.DeepOrange
+import com.gdsc.cheggprepreview.viewmodel.CheggViewModel
 
 fun Modifier.moreModifier(onClick: () -> Unit) = this
     .fillMaxWidth()
@@ -21,7 +22,7 @@ fun Modifier.moreModifier(onClick: () -> Unit) = this
     .padding(horizontal = 8.dp, vertical = 12.dp)
 
 @Composable
-fun MoreScreen(navController: NavHostController) {
+fun MoreScreen(navController: NavHostController, cheggViewModel: CheggViewModel) {
     Scaffold(
         topBar = {
             Column(
