@@ -19,6 +19,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.gdsc.cheggprepreview.ui.theme.DeepOrange
 import com.gdsc.cheggprepreview.ui.theme.LightOrange
+import com.gdsc.cheggprepreview.viewmodel.CheggViewModel
 
 enum class CreateState {
     TitleScreen,
@@ -26,7 +27,7 @@ enum class CreateState {
 }
 
 @Composable
-fun CreateScreen(navController: NavHostController) {
+fun CreateScreen(navController: NavHostController, viewModel: CheggViewModel) {
     // 사용자가 입력한 deckTitle 기억해서 DeckTitleTextField 컴포저블에 전달하기
     val (deckTitle, setDeckTitle) = remember {
         mutableStateOf("")

@@ -3,15 +3,14 @@ package com.gdsc.cheggprepreview.screens
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Computer
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +24,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.gdsc.cheggprepreview.models.DECK_ADDED
+import com.gdsc.cheggprepreview.models.DECK_CREATED
+import com.gdsc.cheggprepreview.models.Deck
+import com.gdsc.cheggprepreview.navigation.Screen
 import com.gdsc.cheggprepreview.ui.theme.DeepOrange
+import com.gdsc.cheggprepreview.viewmodel.CheggViewModel
 
 enum class SearchState {
     ButtonScreen,
@@ -34,47 +38,94 @@ enum class SearchState {
 }
 
 @Composable
-fun SearchScreen(navController: NavHostController) {
-    val (screenState, setScreenState) = remember {
-        mutableStateOf(SearchState.ButtonScreen)
-    }
-
-    val (queryString, setQueryString) = remember {
-        mutableStateOf("")
-    }
-
-    // screenState에 따라 다른 화면 보여주기
-    when (screenState) {
+fun SearchScreen(navController: NavHostController, viewModel: CheggViewModel) {
+    // 뷰모델에 저장된 screenState에 따라 다른 화면 보여주기
+    when (viewModel.searchScreenState.value) {
         SearchState.ButtonScreen -> {
             SearchButtonScreen {
-                // 검색창이 비어 있지 않으면 ResultScreen
-                if(queryString.isNotBlank()){
-                    setScreenState(SearchState.ResultScreen)
-                }else{ // 검색창이 비어있으면 QueryScreen
-                    setScreenState(SearchState.QueryScreen)
+                // 뷰모델에 저장된 검색어가 있으면 ResultScreen으로 이동
+                if (viewModel.queryString.value.isNotBlank()) {
+                    viewModel.toResultScreen()
+                } else { // 없으면 QueryScreen으로 이동
+                    viewModel.toQueryScreen()
                 }
             }
         }
 
         SearchState.QueryScreen -> {
             SearchQueryScreen(
-                queryString = queryString,
-                setQueryString = setQueryString,
-                toButtonScreen = { setScreenState(SearchState.ButtonScreen) },
-                toResultScreen = { setScreenState(SearchState.ResultScreen) }
+                queryString = viewModel.queryString.value,
+                // cf. 더블콜론(::)은 함수 및 클래스 참조 등에 사용된다.
+                setQueryString = viewModel::setQueryString,
+                toButtonScreen = viewModel::toButtonScreen,
+                toResultScreen = viewModel::toResultScreen
             )
         }
 
         SearchState.ResultScreen -> {
             SearchResultScreen(
-                queryString = queryString,
-                setQueryString = setQueryString,
-                toButtonScreen = { setScreenState(SearchState.ButtonScreen) },
-                onSearchKey = { /* 검색 결과 업데이트 */ }
+                queryString = viewModel.queryString.value,
+                setQueryString = viewModel::setQueryString,
+
+                // 뷰모델로부터 검색 결과를 받아 DeckScreen에 전달
+                getQueryResult = viewModel::getQueryResult,
+                toButtonScreen = viewModel::toButtonScreen,
+                toDeckScreen = {
+                    navController.navigate(
+                        Screen.Deck.route + "/${it.deckTitle}/${it.cardList.size}"
+                    ) // deck 클릭 시 화면 전환
+                }
             )
         }
     }
+ }
 
+@Composable
+fun SearchResultScreen(
+    queryString: String,
+    setQueryString: (String) -> Unit,
+    getQueryResult: () -> List<Deck>,
+    toButtonScreen: () -> Unit,
+    toDeckScreen: (Deck) -> Unit
+) {
+    val (queryResult, setQueryResult) = remember {
+        mutableStateOf(getQueryResult())
+    }
+
+    Scaffold(
+        topBar = {
+            SearchTopBar(
+                queryString = queryString,
+                setQueryString = setQueryString,
+                onBackButtonClick = toButtonScreen,
+                onSearchKey = {
+                    setQueryResult(getQueryResult())
+                }
+            )
+        }
+    ) {
+        LazyColumn(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp)) {
+            queryResult.forEach {
+                item {
+                    DeckInResult(
+                        deck = it,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        onClick = toDeckScreen
+                    )
+                }
+            }
+            item{
+                Spacer(modifier = Modifier.height(50.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchButtonScreen(onButtonClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -100,9 +151,8 @@ fun SearchScreen(navController: NavHostController) {
                 .fillMaxSize()
                 .padding(vertical = 8.dp, horizontal = 16.dp)
         ) {
-            FindFlashCards(onClick = { /* 텍스트 입력 창이 나오도록 */ })
+            FindFlashCards(onClick = onButtonClick)
             Spacer(modifier = Modifier.height(24.dp))
-
             Divider(
                 Modifier
                     .fillMaxWidth(.15f)
@@ -110,32 +160,23 @@ fun SearchScreen(navController: NavHostController) {
                 color = DeepOrange
             )
             Spacer(modifier = Modifier.height(8.dp))
-
             Text(
                 text = "Choose your subject",
                 style = MaterialTheme.typography.h6,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
-
             Text(
                 text = "Jump into studying with free flashcards that are right for you",
                 style = MaterialTheme.typography.h6,
             )
             Spacer(modifier = Modifier.height(16.dp))
-
-            // SubjectItem 7번 보여주기
             repeat(7) {
                 SubjectItem()
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
-}
-
-@Composable
-fun SearchButtonScreen(function: () -> Unit) {
-    TODO("Not yet implemented")
 }
 
 @Composable
@@ -161,7 +202,7 @@ fun SearchQueryScreen(
                 .fillMaxHeight(.25f),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center
-        ){
+        ) {
             Text(
                 text = "what are you learning today?",
                 style = MaterialTheme.typography.body1,
@@ -170,30 +211,6 @@ fun SearchQueryScreen(
                 fontWeight = FontWeight.Bold
             )
         }
-    }
-}
-
-@Composable
-fun SearchResultScreen(
-    queryString: String,
-    setQueryString: (String) -> Unit,
-    toButtonScreen: () -> Unit,
-    onSearchKey: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(.25f),
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.Center
-    ){
-        Text(
-            text = "$queryString 검색 결과",
-            style = MaterialTheme.typography.body1,
-            fontSize = 20.sp,
-            color = Color.LightGray,
-            fontWeight = FontWeight.Bold
-        )
     }
 }
 
@@ -316,3 +333,70 @@ fun SubjectItem() {
     }
 }
 
+@Composable
+fun DeckInResult(
+    deck: Deck,
+    modifier: Modifier,
+    onClick: (Deck) -> Unit
+) {
+    Column( // vertical (수직)
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                width = 2.dp,
+                color = Color.LightGray
+            )
+            .clickable(onClick = {
+                onClick(deck)
+            })
+            .padding(16.dp)
+    ) {
+        Text(
+            text = deck.deckTitle,
+            style = MaterialTheme.typography.h5,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Row( // horizontal (수평)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+            // 가로 방향으로 요소 간의 간격 띄우기
+            // https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/Arrangement
+        ) {
+            Text(
+                text = deck.cardList.size.toString() + if (deck.cardList.size > 1) " Cards" else "Card",
+                style = MaterialTheme.typography.subtitle1,
+                fontWeight = FontWeight.Bold,
+                color = Color.Gray
+            )
+
+            when (deck.deckType) {
+                DECK_CREATED -> { // 내가 만든 DECK이고,
+                    if (deck.shared) { // 공유한 것이라면
+                        Icon(
+                            imageVector = Icons.Default.Visibility,
+                            contentDescription = "shared",
+                            tint = Color.Gray
+                        )
+                    } else { // 공유하지 않은 것이라면
+                        Icon(
+                            imageVector = Icons.Default.VisibilityOff,
+                            contentDescription = "not shared",
+                            tint = Color.Gray
+                        )
+                    }
+                }
+
+                DECK_ADDED -> { // 다른 사람이 만든 DECK이고,
+                    if (deck.bookmarked) { // 북마크를 추가한 경우라면
+                        Icon(
+                            imageVector = Icons.Default.Bookmark,
+                            contentDescription = "bookmark",
+                            tint = Color.Gray
+                        )
+                    } // 북마크 추가하지 않은 경우는 아이콘 X
+                }
+            }
+        }
+    }
+}
