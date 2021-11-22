@@ -49,27 +49,18 @@ class CheggViewModel: ViewModel() {
     }
 
     // totalDeckList에서 queryString을 포함하고 있는 deck 목록들을 찾아 반환한다.
-//    fun getQueryResult() : SnapshotStateList<Deck> {
-//        return totalDeckList.filter {
-//            it.deckTitle.lowercase(Locale.getDefault())
-//              .contains(queryString.value.lowercase())
-//        }.toMutableStateList()
-//    }
-
-    // it 생략한 경우
-//    fun getQueryResult() : SnapshotStateList<Deck> {
-//        return totalDeckList.filter { deck ->
-//            deck.deckTitle.lowercase(Locale.getDefault())
-//                .contains(queryString.value.lowercase())
-//        }.toMutableStateList()
-//    }
-
-    // 코틀린은 리턴 타입을 유추할 수 있기 때문에 다음과 같이 코드를 간략히 작성할 수 있다.
-    // 필터링 결과인 리턴값을 함수명에 대입하는 것처럼 보인다.
     fun getQueryResult() = totalDeckList.filter {  deck ->
             deck.deckTitle.lowercase(Locale.getDefault())
                 .contains(queryString.value.lowercase())
     }.toMutableStateList()
+
+    // createScreenState에 따라 TitleScreen이나 CardScreen을 보여준다.
+    var createScreenState = mutableStateOf(CreateState.TitleScreen)
+        private set
+
+    fun toCardScreen() {
+        createScreenState.value = CreateState.CardScreen
+    }
 
     // 샘플 데이터 사용해서 deck 목록 초기화 (나중에 파이어베이스 사용할 예정)
     init {

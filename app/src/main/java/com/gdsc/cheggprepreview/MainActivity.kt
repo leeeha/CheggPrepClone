@@ -11,6 +11,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,12 +26,18 @@ import com.gdsc.cheggprepreview.navigation.BottomNavigationBar
 import com.gdsc.cheggprepreview.navigation.Screen
 import com.gdsc.cheggprepreview.screens.*
 import com.gdsc.cheggprepreview.viewmodel.CheggViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
 
 class MainActivity : ComponentActivity() {
+
+    @ExperimentalMaterialApi
+    @ExperimentalPagerApi
+    @ExperimentalComposeUiApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             CheggPrepReviewTheme {
+                //PracticeScreen()
                 val navController = rememberNavController()
 
                 val cheggViewModel: CheggViewModel = viewModel()
@@ -90,6 +97,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     CheggPrepReviewTheme {
+
     }
 }
 

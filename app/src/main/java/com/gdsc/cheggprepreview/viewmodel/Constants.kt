@@ -1,5 +1,12 @@
 package com.gdsc.cheggprepreview.viewmodel
 
-class Constants {
+enum class SearchState {
+    ButtonScreen,
+    QueryScreen,
+    ResultScreen
+}
 
+enum class CreateState {
+    TitleScreen, // 0
+    CardScreen // 1
 }

@@ -3,7 +3,7 @@ package com.gdsc.cheggprepreview.models
 /*
     홈 화면에서 Bookmarks와 Created로 나누고,
     학습 이력이 있는 것 또한 보여주기 때문에
-    우선 자신이 만든 것과 다른 사람이 만든 것을 구분하겠습니다 - deckType.
+    자신이 만든 것과 다른 사람이 만든 것을 구분해야 함. (deckType)
  */
 data class Deck(
     val deckType: Int,
