@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">CheggPrepReview</string>
+    <string name="app_name">CheggPrepClone</string>
+    <string name="web_client_id">474820146752-4t60omrdc3koc3os6itqvdmhsohsb1c7.apps.googleusercontent.com</string>
 </resources>
